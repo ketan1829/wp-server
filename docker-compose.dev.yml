@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  wa-server-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev # Use Dockerfile.dev for development
+    volumes:
+      - ./config.ts:/usr/src/wpp-server/config.ts
+      - ./wppconnect_tokens:/usr/src/wpp-server/tokens
+      - /usr/src/wpp-server/node_modules
+    ports:
+      - '21466:21466'
+    command: ['yarn', 'dev'] # Use yarn dev for hot-reloading
+
+volumes:
+  wppconnect_tokens: {}
