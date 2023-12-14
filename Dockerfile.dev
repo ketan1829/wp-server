@@ -1,28 +1,11 @@
-FROM node:lts-alpine3.18 as base
-WORKDIR /usr/src/wpp-server
+FROM node:lts-alpine3.18
+
 ENV NODE_ENV=development PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-COPY package.json ./
-RUN yarn install --pure-lockfile && \
-    yarn cache clean
 
-FROM base as build
-WORKDIR /usr/src/wpp-server
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-COPY package.json  ./
-RUN yarn install --production=false --pure-lockfile && \
-    yarn cache clean
-COPY . .
-RUN yarn build
+WORKDIR /home/node/app
+COPY ./app .
 
-FROM base
-WORKDIR /usr/src/wpp-server/
-RUN apk add --no-cache chromium
-RUN yarn cache clean
-COPY . .
-COPY --from=build /usr/src/wpp-server/ /usr/src/wpp-server/
-
-# Install nodemon globally
-RUN yarn global add nodemon
+RUN apk add chromium && \
+    yarn install
 
 EXPOSE 21465
-CMD ["nodemon", "dist/server.js"]  # Use nodemon for hot-reloading
